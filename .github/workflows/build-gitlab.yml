@@ -1,0 +1,37 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Build GitLab (Only Tagged Releases)
+
+# Controls when the workflow will run
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'The tag of the Version you want to release'
+        required: true
+    
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - uses: actions/checkout@v2.4.0
+      
+      - name: Build GitLab Product
+        run: docker build ./gitlab --file "./gitlab/Dockerfile" --build-arg GITLAB_VERSION=${{ github.event.inputs.version }} --tag artemis-gitlab
+  
+      - name: Log into registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+        
+      - name: Push Image
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/artemis-gitlab:${{ github.event.inputs.version }}
+          echo "ImageId will be $IMAGE_ID"
+          docker tag artemis-gitlab $IMAGE_ID
+          docker push $IMAGE_ID
