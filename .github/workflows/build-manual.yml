@@ -1,0 +1,65 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Build Manual (Branches or Tags)
+
+# Controls when the workflow will run
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'The Version (Name) you want to release'
+        required: true
+      branchOrTag:
+        description: 'The Tag or Branch to Build'
+        required: true
+      repository:
+        type: choice
+        description: The Base Repository for Building
+        options:
+          - https://github.com/kit-sdq/Artemis
+          - https://github.com/ls1intum/Artemis
+        
+     
+    
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      packages: write
+    
+    env:
+      directory: ${{ matrix.directory }}
+      tag: ${{ matrix.tag }}
+    
+    strategy:
+      matrix:
+        product: [frontend, backend]
+        include:
+          - product: frontend
+            directory: "./artemis-client"
+            tag: artemis-frontend
+          - product: backend
+            directory: "./artemis-server"
+            tag: artemis-backend
+    
+    steps:
+      - uses: actions/checkout@v2.4.0
+      
+      - name: Build Product
+        run: docker build $directory --file "$directory/Dockerfile.manual" --build-arg ARTEMIS_VERSION=${{ github.event.inputs.branchOrTag }} --build-arg ARTEMIS_GIT_REPOSITORY=${{ github.event.inputs.repository }}  --tag $tag
+  
+      - name: Log into registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+        
+      - name: Push Image
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$tag:${{ github.event.inputs.version }}
+          echo "ImageId will be $IMAGE_ID"
+          docker tag $tag $IMAGE_ID
+          docker push $IMAGE_ID
+          
+
