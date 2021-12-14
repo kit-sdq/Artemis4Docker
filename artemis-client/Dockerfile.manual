@@ -25,7 +25,7 @@ RUN echo "Building frontend from $ARTEMIS_GIT_REPOSITORY" \
   && git clone --depth 1 --branch $ARTEMIS_VERSION $ARTEMIS_GIT_REPOSITORY \
   && cd Artemis \
   && npm install \
-  && NODE_OPTIONS="--max_old_space_size=6144" npm run webapp:prod \
+  && APP_VERSION=$(./gradlew properties -q | grep "^version:" | awk '{print $2}') NODE_OPTIONS="--max_old_space_size=6144" npm run webapp:prod \
   && rm -f build/resources/main/static/stats.json build/resources/main/static/report.html \
   && rsync -a src/main/resources/public/ build/resources/main/static/public/
 
