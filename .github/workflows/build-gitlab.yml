@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
       
-      - name: Build GitLab Product
+      - name: Build GitLab ${{ github.event.inputs.version }}
         run: docker build ./gitlab --file "./gitlab/Dockerfile" --build-arg GITLAB_VERSION=${{ github.event.inputs.version }} --tag artemis-gitlab
   
       - name: Log into registry
