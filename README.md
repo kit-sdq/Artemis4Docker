@@ -1,3 +1,5 @@
+# DEPRECATED: Simplified Build Scripts. This repository is not needed anymore.
+
 # Artemis4Docker - Frontend & Backend Docker Images from Artemis
 This repository provides workflows to create all needed images to deploy [Artemis](https://github.com/ls1intum/Artemis)
 
