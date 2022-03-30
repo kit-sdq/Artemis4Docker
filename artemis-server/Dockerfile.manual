@@ -5,7 +5,7 @@ ARG ARTEMIS_VERSION=main
 ####################
 # Build stage      #
 ####################
-FROM openjdk:16-jdk-buster AS build
+FROM openjdk:17-jdk-buster AS build
 
 ENV LC_ALL C
 
@@ -28,7 +28,7 @@ RUN cd /build/Artemis \
 ####################
 # Execution stage  #
 ####################
-FROM openjdk:16-jdk-buster
+FROM openjdk:17-jdk-buster
 
 ARG ARTEMIS_VERSION
 ARG GOSU_VERSION=1.12
