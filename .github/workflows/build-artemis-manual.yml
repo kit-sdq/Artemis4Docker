@@ -17,8 +17,8 @@ on:
         required: true
         description: The Base Repository for Building
         options:
-          - https://github.com/kit-sdq/Artemis
-          - https://github.com/ls1intum/Artemis
+          - kit-sdq/Artemis
+          - ls1intum/Artemis
         
      
     
@@ -26,7 +26,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
-    name: Build ${{ github.event.inputs.release-tag }} @ ${{ github.event.inputs.repository }}
+    name: Build ${{ github.event.inputs.release-tag }} using ${{ github.event.inputs.branchOrTag }} @ ${{ github.event.inputs.repository }}
     runs-on: ubuntu-latest
     
     permissions:
@@ -34,16 +34,14 @@ jobs:
       packages: write
 
     env:
-      CI: true
       node: 16.x
       java: 17
-      RAW_URL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}
 
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3.0.2
         with:
-          repository: ${{ github.events.input.repository }}
-          ref: ${{ github.events.input.branchOrTag }}
+          repository: ${{ github.event.inputs.repository }}
+          ref: ${{ github.event.inputs.branchOrTag }}
       
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -53,7 +51,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: '${{ env.java }}'
           cache: 'gradle'
       - name: Production Build
@@ -72,7 +70,7 @@ jobs:
         
       - name: Push Image
         run: |
-          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$tag:${{ github.event.inputs.release-tag }}
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/artemis:${{ github.event.inputs.release-tag }}
           echo "ImageId will be $IMAGE_ID"
           docker tag artemis $IMAGE_ID
           docker push $IMAGE_ID
