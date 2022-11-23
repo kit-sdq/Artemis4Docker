@@ -1,3 +1,5 @@
+:warning: Docker Images of Artemis are used now. We don't need this repository anymore. :warning: 
+
 # Artemis4Docker - Docker Images from Artemis
 This repository provides workflows to create all needed images to test & deploy [Artemis](https://github.com/ls1intum/Artemis)
 
